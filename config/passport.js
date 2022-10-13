@@ -29,7 +29,7 @@ const initialize = (passport) => {
     })
 }
 
-const checkAutenticated = (req, res, next) => {
+const checkAutenticated = (passport) => (req, res, next) => {
 
     if (req.isAuthenticated()) return next()
 

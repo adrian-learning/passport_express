@@ -23,16 +23,9 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.post('/login', (req, res) => {
-    console.log('Before Authenticate')
-    passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/login',
-        failureFlash: true
-    })
-})
 
 
+app.use('/login', loginRoute(passport))
 
 app.get('/', passportInitialize.checkAutenticated, (req, res) => {
     res.send(`Home Page of ${req.usr.name}`)
