@@ -26,15 +26,10 @@ app.use(cookieParser())
 app.use('/login', loginRoute)
 
 //Home
-app.get('/', (req,res,next) => {
-    console.log(req.cookies)
-    next()
-} , passport.authenticate('jwt-cookiecombo', {
-    session: false, 
-}), (req, res) => {
-    console.log('User é:', req.user)
+app.get('/', (req, res) => {
+    console.log('User é:', req.body)
     
-    res.render('index.ejs', { user: req.user })
+    //res.render('index.ejs', { user: req.user })
 })
 
 

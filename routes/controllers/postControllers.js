@@ -20,7 +20,7 @@ const postLogin = async (req, res) => {
             console.log('Comparou sim')
             const token = jwt.sign(usr, jwtConfig.jwt.secret, jwtConfig.jwt.options)
 
-            //res.user = { user: usr }
+            req.user = { user: usr }
 
             res.cookie('jwt', token, jwtConfig.jwt.cookie).status(200).redirect('/')
             // res.render('index.ejs',{
