@@ -6,13 +6,9 @@ const PostLoginController = require('./controllers/postControllers')
 const passportConfig = require('../config/passport')
 
 
-const routerPassaport = (passport) => {
+router.get('/', GetLoginController.getFormLogin)
 
-    router.get('/', checkIsNotAuthenticated, GetLoginController.getFormLogin)
+router.post('/', PostLoginController.postLogin)
 
-    router.post('/', PostLoginController.postLogin(passport))
 
-    return router
-}
-
-module.exports = routerPassaport
+module.exports = router

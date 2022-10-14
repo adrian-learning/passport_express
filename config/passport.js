@@ -1,36 +1,43 @@
-const LocalStrategy = require('passport-local').Strategy
+const JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
+
+const JwtCookieComboStrategy = require('passport-jwt-cookiecombo')
+
 const bcrypt = require('bcrypt')
+
+const jwtConfig = require('../config/jwt-config')
 const dbconnection = require('../utils/dbconnection')
 
+const cookieExtractor = (req) => {
+    const token = req.cookies ? req.cookies['jwt'] : null
+    
+    return token
+}
 
 const initialize = (passport) => {
+    // let opts = {}
+    // opts.jwtFromRequest = cookieExtractor
+    // opts.secretOrKey = jwtConfig.jwt.secret
 
-    const autenticar = async (user, password, done) => {
-        if (!user || !password) return done(null, false, { message: 'Informações incorretas!' })
+    passport.use(new JwtCookieComboStrategy({
+        secretOrPublicKey:jwtConfig.jwt.secret,
+        //jwtVerifyOptions: jwtConfig.jwt.options
+    }, (payload, done) => {
+        console.log('OK')
+        const user = dbconnection.getUserById(payload.id)
+        console.log(payload)
 
-        const usr = dbconnection.getUserByName(user)
+        if(user) return done(null, user)
+        else return done(null, false)
+    }))
 
-        if (usr != null || usr != undefined) {
-            const hash = await dbconnection.getUserPassword(usr.id)
-            
-            if (await bcrypt.compare(password, hash)) {
-                console.log('Comparou sim')
-                return done(null, usr)
-            }
-            else {
-                console.log('falhou senha')
-                return done(null, false, { message: 'Senha Incorreta' })
-            }
-        }
+    // passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
+    //     const user = dbconnection.getUserById(jwt_payload.id)
+    //     console.log(jwt_payload)
 
-        return done(null, false, { message: 'Usuario não existe!' })
-    }
-
-    passport.use(new LocalStrategy({ usernameField: 'user', passwordField: 'pass' }, autenticar))
-    passport.serializeUser((usr, done) => done(null, usr.id))
-    passport.deserializeUser((id, done) => {
-        return done(null, dbconnection.getUserById(id))
-    })
+    //     if(user) done(null, user)
+    //     else done(null, false)
+    // }));
 }
 
 const checkAutenticated = (req, res, next) => {
@@ -39,7 +46,7 @@ const checkAutenticated = (req, res, next) => {
 }
 
 const checkIsNotAuthenticated = (req, res, next) => {
-    if(!req.isAuthenticated()) return next()
+    if (!req.isAuthenticated()) return next()
     res.redirect('/')
 }
 

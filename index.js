@@ -2,38 +2,46 @@ require('dotenv').config()
 
 const express = require('express')
 const passport = require('passport')
+const cookieParser = require("cookie-parser")
+
 const session = require('express-session')
 const app = express()
 const flash = require('express-flash')
-const passportInitialize = require('./config/passport')
+const passportConfig = require('./config/passport')
 
 const loginRoute = require('./routes/loginRoute')
 
-passportInitialize.initialize(passport)
+passportConfig.initialize(passport)
 
 
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}))
+
 app.use(passport.initialize())
-app.use(passport.session())
-app.use(flash())
+app.use(cookieParser())
+// app.use(passport.session())
+//app.use(flash())
 
 //Rotas
-app.use('/login', loginRoute(passport))
+app.use('/login', loginRoute)
 
 //Home
-app.get('/', passportInitialize.checkAutenticated, (req, res) => {
+app.get('/', (req,res,next) => {
+    console.log(req.cookies)
+    next()
+} , passport.authenticate('jwt-cookiecombo', {
+    session: false, 
+}), (req, res) => {
+    console.log('User é:', req.user)
+    
     res.render('index.ejs', { user: req.user })
 })
+
 
 app.post('/logout', (req, res) => {
     req.logOut((err) => console.log(err))
     res.redirect('/login')
+    
 })
 
 
