@@ -21,13 +21,11 @@ const postLogin = async (req, res) => {
             const token = jwt.sign(usr, jwtConfig.jwt.secret, jwtConfig.jwt.options)
 
             req.user = { user: usr }
-
             res.cookie('jwt', token, jwtConfig.jwt.cookie).status(200).redirect('/')
             // res.render('index.ejs',{
             //     status: 'success',
             //     message: 'Logado com sucesso',
-            //     user: usr,
-            //     token: `Bearer ${token}`
+            //     user_name: usr.name
             // })
         }
         else {

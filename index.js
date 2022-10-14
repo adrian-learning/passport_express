@@ -8,6 +8,7 @@ const session = require('express-session')
 const app = express()
 const flash = require('express-flash')
 const passportConfig = require('./config/passport')
+const jwtConfig = require('./config/jwt-config')
 
 const loginRoute = require('./routes/loginRoute')
 
@@ -17,26 +18,32 @@ passportConfig.initialize(passport)
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
 
+app.use(session({
+    secret: jwtConfig.jwt.secret
+}))
+
 app.use(passport.initialize())
 app.use(cookieParser())
-// app.use(passport.session())
+app.use(passport.session())
 //app.use(flash())
 
 //Rotas
 app.use('/login', loginRoute)
 
 //Home
-app.get('/', (req, res) => {
-    console.log('User é:', req.body)
-    
-    //res.render('index.ejs', { user: req.user })
+app.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+    console.log('User é:', req.user)
+
+    res.render('index.ejs', { user: req.user })
+
 })
 
 
 app.post('/logout', (req, res) => {
+    if (req.cookies['jwt']) res.clearCookie('jwt')
+
     req.logOut((err) => console.log(err))
-    res.redirect('/login')
-    
+    res.status(200).redirect('/login')
 })
 
 
