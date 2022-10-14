@@ -1,21 +1,24 @@
 const bcrypt = require('bcrypt')
 
-const getUserByName = (name) => {
-    if(name == 'teste') return {id:0, name: user, age: 20, color: 'Red'}
+const users = [
+    {id:0, name: 'teste', age: 20, color: 'Red'},
+    {id:1, name: 'try', age: 30, color: 'Yellow'}
+]
 
-    return null
-}
+const getUserByName = (name) => users.find(usr => usr.name === name)
+const getUserById = (id) => users.find(usr => usr.id === id)
 
 const getUserPassword = async (id) => {
     if(id != 0) return null
     
-    const pass = 1234
-    const passHashed = await bcrypt.hash(pass, process.env.BCRYPT_SALTS)
-
+    const pass = '1234'
+    const passHashed = await bcrypt.hash(pass, parseInt(process.env.BCRYPT_SALTS))
     return passHashed
 }
 
 
 module.exports = {
-    getUserByName
+    getUserByName,
+    getUserPassword,
+    getUserById
 }
