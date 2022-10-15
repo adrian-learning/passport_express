@@ -19,23 +19,22 @@ app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
 
 app.use(session({
-    secret: jwtConfig.jwt.secret
+    secret: process.env.SESSION_SECRET
 }))
 
 app.use(passport.initialize())
 app.use(cookieParser())
 app.use(passport.session())
-//app.use(flash())
+app.use(flash())
 
 //Rotas
 app.use('/login', loginRoute)
 
 //Home
-app.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/', passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
     console.log('User é:', req.user)
 
     res.render('index.ejs', { user: req.user })
-
 })
 
 

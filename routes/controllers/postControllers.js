@@ -20,19 +20,14 @@ const postLogin = async (req, res) => {
             console.log('Comparou sim')
             const token = jwt.sign(usr, jwtConfig.jwt.secret, jwtConfig.jwt.options)
 
-            req.user = { user: usr }
             res.cookie('jwt', token, jwtConfig.jwt.cookie).status(200).redirect('/')
-            // res.render('index.ejs',{
-            //     status: 'success',
-            //     message: 'Logado com sucesso',
-            //     user_name: usr.name
-            // })
         }
         else {
             console.log('falhou senha')
+            req.flash('message', 'Senha incorreta')
             res.render('login.ejs',{
                 status: 'failed',
-                message: 'Senha incorreta'
+                message: req.flash('Senha incorreta')
             })
         }
     }
