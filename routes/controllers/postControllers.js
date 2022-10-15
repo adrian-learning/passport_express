@@ -24,18 +24,15 @@ const postLogin = async (req, res) => {
         }
         else {
             console.log('falhou senha')
-            req.flash('message', 'Senha incorreta')
-            res.render('login.ejs',{
-                status: 'failed',
-                message: req.flash('Senha incorreta')
-            })
+            req.flash('info', 'Senha incorreta')
+            res.redirect('/login')
         }
     }
 
-    else res.render('login.ejs',{
-        status: 'failed',
-        message: 'Usuario não existe'
-    })
+    else{
+        req.flash('info', 'Usuário não existe')
+        res.redirect('/login')
+    }
 }
 
 module.exports = {

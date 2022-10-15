@@ -28,12 +28,18 @@ app.use(passport.session())
 app.use(flash())
 
 //Rotas
-app.use('/login', loginRoute)
+app.use('/login', (req, res, next) => {
+    passport.authenticate('jwt', {session: false}, (err, user) => {
+        if(user) res.redirect('/')
+        else {
+            if (req.cookies['jwt']) res.clearCookie('jwt')
+            next()
+        }
+    })(req,res,next)
+}, loginRoute)
 
 //Home
-app.get('/', passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
-    console.log('User é:', req.user)
-
+app.get('/', passport.authenticate('jwt', {session: false}), (req, res) => {
     res.render('index.ejs', { user: req.user })
 })
 
